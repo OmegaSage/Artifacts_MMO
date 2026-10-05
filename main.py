@@ -1,63 +1,43 @@
-import personal
-import requests
 import asyncio
+from artifacts import AsyncArtifactsClient
+import personal
 
-CHARACTER_NAME = personal.CHARACTER_NAME
-TOKEN = personal.TOKEN
+async def main():
+    async with AsyncArtifactsClient(token=personal.TOKEN) as client:
+        char = client.character(personal.CHARACTER_ONE)
+        char2 = client.character(personal.CHARACTER_TWO)
+        char3 = client.character(personal.CHARACTER_THREE)
+        char4 = client.character(personal.CHARACTER_FOUR)
+        char5 = client.character(personal.CHARACTER_FIVE)
 
-# API endpoint for the move action
-url = f"https://api.artifactsmmo.com/my/{CHARACTER_NAME}/action/move"
+        while True:
+            # Get fresh character info
+            info = await char.get()
+            print(f"HP: {info.hp}/{info.max_hp}")
 
-# Authentication headers — your token identifies you on the server
-headers = {
-    "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {TOKEN}"
-}
+            # Heal if HP is low
+            if info.hp < 30:
+                has_potion = any(
+                    item.code == "healing_potion" and item.quantity > 0
+                    for item in info.inventory
+                )
 
-# Target coordinates: move to tile (0, 1) where the chicken is
-body = { "x": 0, "y": 1 }
+                if has_potion:
+                    print("Using healing potion...")
+                    await char.inventory.use(code="healing_potion", quantity=1)
+                else:
+                    print("No potion left – resting instead")
+                    await char.rest()
 
-try:
-    response = requests.post(url, headers=headers, json=body)
-    data = response.json()
+            # Fight
+            result = await char.fight()
+            if result.fight.result.value == "lose":
+                print("Died! Stopping.")
+                break
 
-    if "error" in data:
-        raise Exception(data["error"]["message"])
+            # Optional: small delay or other async work
+            # await asyncio.sleep(0.5)
 
-    destination = data["data"]["destination"]
-    cooldown = data["data"]["cooldown"]
 
-    print(f"✅ Moved to ({destination['x']}, {destination['y']}) on {destination['name']}")
-    print(f"⏳ Cooldown started: {cooldown['total_seconds']} seconds")
-except Exception as e:
-    print(f"❌ {e}")
-
-#attempting to merge movement and attack scripts
-# first problem, Cooldowns... how to make it wait? Async?
-
-url = f"https://api.artifactsmmo.com/my/{CHARACTER_NAME}/action/fight"
-headers = {
-    "Accept": "application/json",
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {TOKEN}"
-}
-
-try:
-    response = requests.post(url, headers=headers)
-    data = response.json()
-
-    if "error" in data:
-        raise Exception(data["error"]["message"])
-
-    fight = data["data"]["fight"]
-    fight_stats = fight["characters"][0]
-
-    print("🏆 Fight won!" if fight["result"] == "win" else "💀 Fight lost!")
-    print(f"⚔️  XP gained: {fight_stats['xp']} | HP remaining: {fight_stats['final_hp']}")
-
-    if len(fight_stats["drops"]) > 0:
-        drops_str = ", ".join([f"{d['quantity']}x {d['code']}" for d in fight_stats["drops"]])
-        print(f"🎁 Loot dropped: {drops_str}")
-except Exception as e:
-    print(f"❌ {e}")
+if __name__ == "__main__":
+    asyncio.run(main())
