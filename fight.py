@@ -2,7 +2,7 @@ import personal
 from artifacts import ArtifactsClient   # or AsyncArtifactsClient
 
 with ArtifactsClient(token=personal.TOKEN) as client:
-    char = client.character(personal.CHARACTER_NAME)
+    char = client.character(personal.CHARACTER_ONE)
 
     char.move(x=0, y=1)          # auto-waits
     result = char.fight()        # auto-waits
