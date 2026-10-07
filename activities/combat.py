@@ -2,7 +2,7 @@ import asyncio
 from artifacts.errors import RetryExhaustedError, ArtifactsAPIError
 
 
-async def combat_loop(char, fight_x: int = 0, fight_y: int = 1, heal_threshold: int = 30):
+async def combat_loop(char, fight_x: int = 0, fight_y: int = 1, heal_threshold: int = 90):
     """
     Fight on a specific tile. Different characters can have different locations.
     """

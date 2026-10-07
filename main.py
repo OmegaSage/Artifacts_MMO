@@ -1,7 +1,7 @@
 import asyncio
 from artifacts import AsyncArtifactsClient
 import personal
-from activities import gathering, combat#, crafting # etc.
+from activities import gathering, combat, clean_inventory #, crafting # etc.
 
 
 async def main():
@@ -14,6 +14,19 @@ async def main():
             "five":  client.character(personal.CHARACTER_FIVE),
         }
 
+        # ============================================
+        # Clean inventory at the start of the session
+        # ============================================
+        print("Cleaning inventories...")
+        deposit_all = clean_inventory.deposit_all
+        await deposit_all(chars["one"]),
+        await deposit_all(chars["two"]),
+        #await deposit_all(chars["three"]),
+        #await deposit_all(chars["four"]),
+        #await deposit_all(chars["five"]),
+        print("All characters cleaned.\n")
+
+        # Now start the normal tasks
         tasks = [
             # Two gatherers with different resources
             gathering.gather_loop(chars["two"], "copper_ore", target_qty=20),
