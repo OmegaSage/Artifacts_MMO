@@ -1,43 +1,41 @@
 import asyncio
 from artifacts import AsyncArtifactsClient
 import personal
-import gathering
+from activities import gathering, crafting, combat  # etc.
+
 
 async def main():
     async with AsyncArtifactsClient(token=personal.TOKEN) as client:
-        char1 = client.character(personal.CHARACTER_ONE)
-        char2 = client.character(personal.CHARACTER_TWO)
-        char3 = client.character(personal.CHARACTER_THREE)
-        char4 = client.character(personal.CHARACTER_FOUR)
-        char5 = client.character(personal.CHARACTER_FIVE)
+        chars = {
+            "one":   client.character(personal.CHARACTER_ONE),
+            "two":   client.character(personal.CHARACTER_TWO),
+            "three": client.character(personal.CHARACTER_THREE),
+            "four":  client.character(personal.CHARACTER_FOUR),
+            "five":  client.character(personal.CHARACTER_FIVE),
+        }
 
-        while True:
-            # Get fresh character info
-            info = await char1.get()
-            print(f"HP: {info.hp}/{info.max_hp}")
+        tasks = [
+            # Two gatherers with different resources
+            gathering.gather_loop(chars["one"], "ash_wood", target_qty=20),
+            gathering.gather_loop(chars["two"], "copper_ore", target_qty=15, resource_x=2, resource_y=0),
 
-            # Heal if HP is low
-            if info.hp < 30:
-                has_potion = any(
-                    item.code == "healing_potion" and item.quantity > 0
-                    for item in info.inventory
-                )
+            # Crafter
+            crafting.craft_loop(
+                chars["three"],
+                item_code="wooden_staff",
+                quantity=1,
+                materials=[
+                    {"code": "ash_wood", "quantity": 4},
+                    # add more materials as needed
+                ]
+            ),
 
-                if has_potion:
-                    print("Using healing potion...")
-                    await char1.inventory.use(code="healing_potion", quantity=1)
-                else:
-                    print("No potion left – resting instead")
-                    await char1.rest()
+            # Fighter
+            combat.combat_loop(chars["four"], fight_x=0, fight_y=1),
+        ]
 
-            # Fight
-            result = await char1.fight()
-            if result.fight.result.value == "lose":
-                print("Died! Stopping.")
-                break
+        await asyncio.gather(*tasks)
 
-            # Optional: small delay or other async work
-            # await asyncio.sleep(0.5)
 
 if __name__ == "__main__":
     asyncio.run(main())
