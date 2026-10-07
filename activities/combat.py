@@ -27,10 +27,18 @@ async def combat_loop(char, fight_x: int = 0, fight_y: int = 1, heal_threshold: 
                     await asyncio.sleep(0.1)
 
             result = await char.fight()
-            if result.fight.result.value == "lose":
-                print(f"[{char.name}] Died!")
-                # Optional: break or continue after respawn
+            fight = result.fight
+            my_stats = fight.characters[0]
+
+            print("🏆 Fight won!" if fight.result.value == "win" else "💀 Fight lost!")
+            print(f"⚔️  XP gained: {my_stats.xp} | HP remaining: {my_stats.final_hp}")
+
+            if my_stats.drops:
+                drops_str = ", ".join(f"{d.quantity}x {d.code}" for d in my_stats.drops)
+                print(f"🎁 Loot dropped: {drops_str}")
                 await asyncio.sleep(5)
+
+
 
         except (RetryExhaustedError, ConnectionError, TimeoutError, OSError) as e:
             print(f"[{char.name}] Network error: {e}. Retrying in 10s...")

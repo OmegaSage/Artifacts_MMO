@@ -7,7 +7,7 @@ from artifacts.errors import RetryExhaustedError, ArtifactsAPIError
 async def craft_loop(char, item_code: str, quantity: int = 1,
                      workshop_x: int = 2, workshop_y: int = 1,
                      bank_x: int = 4, bank_y: int = 1,
-                     materials: list[dict] = None):
+                     materials: list[dict] | None = None):
     """
     Generic craft loop:
     1. Go to bank and withdraw required materials

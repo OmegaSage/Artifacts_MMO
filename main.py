@@ -1,7 +1,7 @@
 import asyncio
 from artifacts import AsyncArtifactsClient
 import personal
-from activities import gathering, crafting, combat  # etc.
+from activities import gathering, combat#, crafting # etc.
 
 
 async def main():
@@ -16,22 +16,22 @@ async def main():
 
         tasks = [
             # Two gatherers with different resources
-            gathering.gather_loop(chars["one"], "ash_wood", target_qty=20),
-            gathering.gather_loop(chars["two"], "copper_ore", target_qty=15, resource_x=2, resource_y=0),
-
-            # Crafter
-            crafting.craft_loop(
-                chars["three"],
-                item_code="wooden_staff",
-                quantity=1,
-                materials=[
-                    {"code": "ash_wood", "quantity": 4},
-                    # add more materials as needed
-                ]
-            ),
+            gathering.gather_loop(chars["two"], "copper_ore", target_qty=20),
+            #gathering.gather_loop(chars["two"], "copper_ore", target_qty=15, resource_x=2, resource_y=0),
 
             # Fighter
-            combat.combat_loop(chars["four"], fight_x=0, fight_y=1),
+            combat.combat_loop(chars["one"], fight_x=1, fight_y=-2),
+
+            # Crafter
+            #crafting.craft_loop(
+            #    chars["three"],
+            #    item_code="wooden_staff",
+            #    quantity=1,
+            #    materials=[
+            #        {"code": "ash_wood", "quantity": 4},
+            #        # add more materials as needed
+            #    ]
+            #),
         ]
 
         await asyncio.gather(*tasks)

@@ -5,7 +5,7 @@ from artifacts.errors import RetryExhaustedError, ArtifactsAPIError
 
 
 async def gather_loop(char, item_code: str, target_qty: int = 20,
-                      resource_x: int = -1, resource_y: int = 0,
+                      resource_x: int = 2, resource_y: int = 0,
                       bank_x: int = 4, bank_y: int = 1):
     """
     Continuously gather until target_qty, deposit at bank, repeat.
