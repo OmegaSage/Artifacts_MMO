@@ -17,25 +17,31 @@ async def main():
         # ============================================
         # Clean inventory at the start of the session
         # ============================================
-        print("Cleaning inventories...")
+        print("\nCleaning inventories...")
         deposit_all = clean_inventory.deposit_all
-        await deposit_all(chars["one"]),
-        await deposit_all(chars["two"]),
-        #await deposit_all(chars["three"]),
-        #await deposit_all(chars["four"]),
-        #await deposit_all(chars["five"]),
+        await deposit_all(chars["one"], client, ["apple"])
+        await deposit_all(chars["two"], client)
+        #await deposit_all(chars["three"], client)
+        #await deposit_all(chars["four"], client)
+        #await deposit_all(chars["five"], client)
         print("All characters cleaned.\n")
 
         # Now start the normal tasks
         tasks = [
-            # Two gatherers with different resources
-            gathering.gather_loop(chars["two"], "copper_ore", target_qty=20),
-            #gathering.gather_loop(chars["two"], "copper_ore", target_qty=15, resource_x=2, resource_y=0),
+            # ---- Gatherer ----
+            gathering.gather_loop(
+                chars["two"],
+                client,
+                item_code = "ash_wood",
+                resource_code = "ash_tree",
+                target_qty = 100
+            ),
+            #gathering.gather_loop(chars["two"], client, "copper_ore", target_qty=15),
 
-            # Fighter
-            combat.combat_loop(chars["one"], fight_x=1, fight_y=-2),
+            # ---- Fighter ----
+            combat.combat_loop(chars["one"],client, fight_x=1, fight_y=-2),
 
-            # Crafter
+            # ---- Crafter -----
             #crafting.craft_loop(
             #    chars["three"],
             #    item_code="wooden_staff",
