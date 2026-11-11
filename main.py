@@ -1,7 +1,7 @@
 import asyncio
 from artifacts import AsyncArtifactsClient
 import personal
-from activities import gathering, combat, clean_inventory #, crafting # etc.
+from activities import gathering, combat, clean_inventory #, crafting # etc....
 
 
 async def main():
